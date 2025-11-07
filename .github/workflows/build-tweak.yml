@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Xcode
         run: |
@@ -54,14 +54,14 @@ jobs:
           find .theos -type f \( -name "*.dylib" -o -name "*.deb" \) -exec ls -lh {} \;
 
       - name: Upload dylib artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BlockWAUpdates-dylib
           path: .theos/obj/*/
           retention-days: 30
 
       - name: Upload deb package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BlockWAUpdates-deb
           path: .theos/packages/
@@ -84,7 +84,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check source files
         run: |

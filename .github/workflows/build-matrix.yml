@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Xcode
         run: |
@@ -50,7 +50,7 @@ jobs:
           find .theos/obj -name "*.dylib" -exec file {} \;
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BlockWAUpdates-${{ matrix.name }}
           path: .theos/obj/*/
@@ -63,7 +63,7 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
