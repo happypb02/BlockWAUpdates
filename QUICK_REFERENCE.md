@@ -4,15 +4,15 @@
 
 ```bash
 # 1. 配置用户信息
-git config --global user.email "your-email@example.com"
-git config --global user.name "Your Name"
+git config --global user.email "predty@qq.com"
+git config --global user.name "happypb2"
 
 # 2. 创建初始提交
 git add .
 git commit -m "Initial commit: BlockWAUpdates with GitHub Actions"
 
 # 3. 添加远程仓库（替换 YOUR_USERNAME）
-git remote add origin https://github.com/YOUR_USERNAME/BlockWAUpdates.git
+git remote add origin https://github.com/happypb2/BlockWAUpdates.git
 git branch -M main
 git push -u origin main
 ```

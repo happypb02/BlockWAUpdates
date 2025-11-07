@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     grep \
     xz-utils \
     ca-certificates \
+    liblz4-tool \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建工作目录
@@ -31,6 +32,24 @@ RUN git clone --depth=1 https://github.com/theos/theos.git theos && \
 # 设置环境变量
 ENV THEOS=/root/theos
 ENV PATH=/root/theos/bin:$PATH
+
+# 下载 iOS SDKs (带重试机制)
+RUN mkdir -p $THEOS/sdks && \
+    echo "下载 iOS SDK..." && \
+    cd $THEOS/sdks && \
+    for i in 1 2 3; do \
+        echo "尝试下载第 $i 次..."; \
+        wget -q --show-progress https://github.com/theos/sdks/releases/download/iphone14.4/iPhoneOS14.4.sdk.tar.lz4 2>/dev/null && break; \
+        sleep 2; \
+    done && \
+    if [ -f "iPhoneOS14.4.sdk.tar.lz4" ]; then \
+        echo "SDK 已下载，开始解压..."; \
+        lz4 -d iPhoneOS14.4.sdk.tar.lz4 | tar x; \
+        rm -f iPhoneOS14.4.sdk.tar.lz4; \
+        echo "SDK 下载完成"; \
+    else \
+        echo "警告：SDK 下载失败，继续编译..."; \
+    fi
 
 # 复制项目到容器
 COPY . /root/project

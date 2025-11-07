@@ -23,6 +23,5 @@ BlockWAUpdates_LDFLAGS = -lsubstrate
 # 导入规则
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-# 打包配置
-SUBPROJECTS += prefs
-include $(THEOS_MAKE_PATH)/aggregate.mk
+# 导入打包规则
+include $(THEOS_MAKE_PATH)/package.mk
