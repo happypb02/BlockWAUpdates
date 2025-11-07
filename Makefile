@@ -9,15 +9,15 @@ TARGET = iphone:clang:latest:14.0
 include $(THEOS)/makefiles/common.mk
 
 # 声明 tweaks
-TWEAK_NAME = BlockWAUpdates
+TWEAK_NAME = iospredty
 
 # 源文件
-BlockWAUpdates_FILES = Tweak.xm
-BlockWAUpdates_FRAMEWORKS = Foundation UIKit
+iospredty_FILES = Tweak.xm
+iospredty_FRAMEWORKS = Foundation UIKit
 
 # 编译器标志 - 使用现代 SDK
-BlockWAUpdates_CFLAGS = -fobjc-arc -std=c++17
-BlockWAUpdates_LDFLAGS = -lsubstrate
+iospredty_CFLAGS = -fobjc-arc -std=c++17
+iospredty_LDFLAGS = -lsubstrate
 
 # 导入规则
 include $(THEOS_MAKE_PATH)/tweak.mk
