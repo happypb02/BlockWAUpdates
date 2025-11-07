@@ -14,7 +14,6 @@ TWEAK_NAME = BlockWAUpdates
 # 源文件
 BlockWAUpdates_FILES = Tweak.xm
 BlockWAUpdates_FRAMEWORKS = Foundation UIKit
-BlockWAUpdates_PRIVATE_FRAMEWORKS = MobileSubstrate
 
 # 编译器标志 - 使用现代 SDK
 BlockWAUpdates_CFLAGS = -fobjc-arc -std=c++17
