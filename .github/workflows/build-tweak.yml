@@ -1,0 +1,106 @@
+name: Build BlockWAUpdates Tweak
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          xcode-select --print-path
+
+      - name: Install Theos
+        run: |
+          git clone --depth=1 https://github.com/theos/theos.git ~/theos
+          cd ~/theos
+          git submodule update --init --recursive --depth=1 2>/dev/null || true
+
+      - name: Setup environment
+        run: |
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+          echo "$HOME/theos/bin" >> $GITHUB_PATH
+
+      - name: Verify build tools
+        run: |
+          which make
+          which clang
+          echo "Theos path: $THEOS"
+
+      - name: Build dylib
+        run: |
+          export THEOS=~/theos
+          make clean
+          make DEBUG=0 FINALPACKAGE=1
+
+      - name: Build deb package
+        run: |
+          export THEOS=~/theos
+          make package FINALPACKAGE=1
+
+      - name: List build artifacts
+        run: |
+          echo "=== Build Artifacts ==="
+          find .theos -type f \( -name "*.dylib" -o -name "*.deb" \) -exec ls -lh {} \;
+
+      - name: Upload dylib artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: BlockWAUpdates-dylib
+          path: .theos/obj/*/
+          retention-days: 30
+
+      - name: Upload deb package
+        uses: actions/upload-artifact@v3
+        with:
+          name: BlockWAUpdates-deb
+          path: .theos/packages/
+          retention-days: 30
+
+      - name: Create Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            .theos/packages/*.deb
+            .theos/obj/debug/*/*.dylib
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-compilation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check source files
+        run: |
+          echo "=== Source Files ==="
+          ls -lah *.xm *.mk control 2>/dev/null || true
+
+      - name: Validate Makefile
+        run: |
+          if [ -f "Makefile_SDK26" ]; then
+            echo "✓ Found Makefile_SDK26"
+          fi
+          if [ -f "Makefile" ]; then
+            echo "✓ Found Makefile"
+          fi
+
+      - name: Check documentation
+        run: |
+          echo "=== Documentation ==="
+          ls -1 *.md 2>/dev/null

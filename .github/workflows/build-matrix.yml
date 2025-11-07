@@ -1,0 +1,76 @@
+name: Build Matrix (Multiple Targets)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-matrix:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - name: "arm64"
+            archs: "arm64"
+          - name: "arm64e"
+            archs: "arm64e"
+          - name: "Universal (arm64 + arm64e)"
+            archs: "arm64 arm64e"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Install Theos
+        run: |
+          git clone --depth=1 https://github.com/theos/theos.git ~/theos
+          cd ~/theos
+          git submodule update --init --recursive --depth=1
+
+      - name: Setup environment
+        run: |
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+          echo "$HOME/theos/bin" >> $GITHUB_PATH
+
+      - name: Build for ${{ matrix.name }}
+        run: |
+          export THEOS=~/theos
+          make clean
+          make DEBUG=0 FINALPACKAGE=1 ARCHS="${{ matrix.archs }}"
+
+      - name: List output
+        run: |
+          echo "=== Built for ${{ matrix.name }} ==="
+          find .theos/obj -name "*.dylib" -exec file {} \;
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: BlockWAUpdates-${{ matrix.name }}
+          path: .theos/obj/*/
+          retention-days: 7
+
+  create-release:
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            BlockWAUpdates-*/debug/*/*.dylib
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

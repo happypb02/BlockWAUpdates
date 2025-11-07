@@ -1,0 +1,9 @@
+Package: com.blockwaupdates.tweak
+Name: BlockWAUpdates
+Version: 1.0.1
+Architecture: iphoneos-arm64
+Description: 阻止 WhatsApp 应用更新提示的越狱插件
+Maintainer: Developer <dev@example.com>
+Author: BlockWAUpdates Team
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 14.0)

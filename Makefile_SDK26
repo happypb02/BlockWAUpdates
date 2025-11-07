@@ -1,0 +1,93 @@
+# BlockWAUpdates Makefile - SDK 26 编译配置
+# 使用最新的 iOS SDK 和 Xcode 工具链
+
+FINALPACKAGE = 1
+DEBUG = 0
+
+# ============================================================================
+# 编译目标配置 - SDK 26 (iOS 18+)
+# ============================================================================
+# 使用最新的 iOS SDK 26，目标最低 iOS 版本 14.0
+TARGET = iphone:clang:latest:14.0
+
+# 支持的架构
+# arm64: 64-bit ARM（iPhone 6s+）
+# arm64e: 64-bit ARM with Pointer Authentication Code（iPhone XS+）
+ARCHS = arm64 arm64e
+
+# ============================================================================
+# Theos 框架导入
+# ============================================================================
+include $(THEOS)/makefiles/common.mk
+
+# ============================================================================
+# Tweak 定义
+# ============================================================================
+TWEAK_NAME = BlockWAUpdates
+
+# 源文件 - 使用现代版本
+BlockWAUpdates_FILES = Tweak_Modern.xm
+
+# 依赖的框架
+BlockWAUpdates_FRAMEWORKS = Foundation UIKit
+
+# 私有框架
+BlockWAUpdates_PRIVATE_FRAMEWORKS = MobileSubstrate
+
+# ============================================================================
+# 编译器配置 - 现代 C++ 和 ARC 支持
+# ============================================================================
+
+# 编译标志
+BlockWAUpdates_CFLAGS = \
+	-fobjc-arc \
+	-fvisibility=hidden \
+	-fvisibility-inlines-hidden \
+	-std=c++17 \
+	-Wall \
+	-Wextra \
+	-Wno-unused-parameter
+
+# C++ 编译标志
+BlockWAUpdates_CXXFLAGS = \
+	-std=c++17 \
+	-fno-rtti \
+	-fno-exceptions
+
+# 优化标志
+BlockWAUpdates_CODESIGN_FLAGS = -s
+
+# 链接标志
+BlockWAUpdates_LDFLAGS = \
+	-lsubstrate \
+	-F$(SDKROOT)/System/Library/Frameworks
+
+# ============================================================================
+# 编译规则
+# ============================================================================
+include $(THEOS_MAKE_PATH)/tweak.mk
+
+# ============================================================================
+# 其他目标
+# ============================================================================
+
+# 清理编译产物
+clean-build:
+	rm -rf $(THEOS_OBJ_DIR)
+	rm -rf .build
+
+# 重新编译
+rebuild: clean-build
+	make
+
+# 查看构建信息
+info:
+	@echo "BlockWAUpdates 构建信息:"
+	@echo "  SDK: $(TARGET)"
+	@echo "  架构: $(ARCHS)"
+	@echo "  源文件: $(BlockWAUpdates_FILES)"
+	@echo "  Theos 路径: $(THEOS)"
+	@echo "  SDK 路径: $(SDKROOT)"
+
+# 默认目标
+.PHONY: clean-build rebuild info
