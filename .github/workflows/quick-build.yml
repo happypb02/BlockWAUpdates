@@ -41,6 +41,10 @@ jobs:
             rm -f iPhoneOS14.4.sdk.tar.lz4
           fi
 
+      - name: Install ldid
+        run: |
+          brew install ldid || true
+
       - name: Setup environment
         run: |
           echo "THEOS=~/theos" >> $GITHUB_ENV
